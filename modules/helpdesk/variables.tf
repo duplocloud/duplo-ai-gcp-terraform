@@ -62,7 +62,7 @@ variable "chart_version" {
   # Move to the release that ships it once the PR merges.
   description = "Helpdesk chart version"
   type        = string
-  default     = "0.2.24-feature-filestore-backend-09fe37e"
+  default     = "0.2.24"
   nullable    = false
 }
 
