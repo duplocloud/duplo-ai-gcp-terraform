@@ -1,6 +1,6 @@
 # duplo-ai-gcp-terraform
 
-DuploCloud AI is [DuploCloud](https://duplocloud.com)'s AI-powered helpdesk: AI agents work support tickets alongside
+DuploCloud AI is [DuploCloud](https://duplocloud.com)'s AI agent platform for DevOps: AI agents work tickets alongside
 your team, with a web interface and optional Slack integration. This repository is the OpenTofu / Terraform code
 that deploys DuploCloud AI into your own Google Cloud project: a VPC, a private GKE cluster, shared storage, Cloud
 Storage buckets, a Google-managed certificate with DNS, and the DuploCloud AI Helm release behind a Gateway API load
