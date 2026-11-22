@@ -1,9 +1,9 @@
-# terraform-google-helpdesk
+# duplo-ai-gcp-terraform
 
-[DuploCloud](https://duplocloud.com) Helpdesk is an AI-powered helpdesk: AI agents work support tickets alongside
+DuploCloud AI is [DuploCloud](https://duplocloud.com)'s AI-powered helpdesk: AI agents work support tickets alongside
 your team, with a web interface and optional Slack integration. This repository is the OpenTofu / Terraform code
-that deploys Helpdesk into your own Google Cloud project: a VPC, a private GKE cluster, shared storage, Cloud
-Storage buckets, a Google-managed certificate with DNS, and the Helpdesk Helm release behind a Gateway API load
+that deploys DuploCloud AI into your own Google Cloud project: a VPC, a private GKE cluster, shared storage, Cloud
+Storage buckets, a Google-managed certificate with DNS, and the DuploCloud AI Helm release behind a Gateway API load
 balancer.
 
 Every layer can be **created** or can **adopt** something you already have: an existing VPC and subnet,
@@ -12,8 +12,8 @@ the same code serves a new project (greenfield) and one with an established plat
 
 You can use this repository on its own. DuploCloud's managed deployment tooling also uses this repository and
 pins tagged releases. It follows the same layout, inputs and output names as the AWS and Azure versions,
-[`terraform-aws-helpdesk`](https://github.com/duplocloud/terraform-aws-helpdesk) and
-[`terraform-azure-helpdesk`](https://github.com/duplocloud/terraform-azure-helpdesk).
+[`duplo-ai-aws-terraform`](https://github.com/duplocloud/duplo-ai-aws-terraform) and
+[`duplo-ai-azure-terraform`](https://github.com/duplocloud/duplo-ai-azure-terraform).
 
 - [Architecture](#architecture)
 - [Requirements](#requirements)
@@ -63,8 +63,8 @@ state with `terraform_remote_state`.
 - OpenTofu 1.10 or later (CI runs 1.13). Terraform 1.10+ also works but is not tested here.
 - A GCS bucket for state, ideally versioned and with uniform bucket-level access. The examples use
   `duplo-helpdesk-tfstate-<project_id>`; any name works.
-- A DuploCloud Helpdesk license token (passed as `secrets.licensing_token`).
-- Vertex AI access in the project to the Anthropic Claude models Helpdesk uses (enable them in Vertex AI Model
+- A DuploCloud AI license token (passed as `secrets.licensing_token`).
+- Vertex AI access in the project to the Anthropic Claude models DuploCloud AI uses (enable them in Vertex AI Model
   Garden). The `platform` root enables the Vertex AI API.
 - Google credentials for the target project with these roles:
 
@@ -74,7 +74,7 @@ state with `terraform_remote_state`.
 | `roles/compute.admin` | VPC, subnets, router, NAT, firewall, reserved IP, SSL policy |
 | `roles/container.admin` | GKE cluster and node pool, Kubernetes and Helm resources (also on an adopted cluster) |
 | `roles/file.editor` | The Filestore instance the CSI driver creates (`filestore` storage mode) |
-| `roles/storage.admin` | Helpdesk buckets and their IAM |
+| `roles/storage.admin` | DuploCloud AI buckets and their IAM |
 | `roles/iam.serviceAccountAdmin` | Node and workload service accounts, Workload Identity bindings |
 | `roles/iam.serviceAccountUser` | Attaching the node service account to the node pool |
 | `roles/resourcemanager.projectIamAdmin` | Project IAM bindings for those service accounts |
@@ -83,9 +83,9 @@ state with `terraform_remote_state`.
 
 ## Helm chart
 
-The `app` root installs the DuploCloud Helpdesk Helm chart, `oci://quay.io/duplocloud/helpdesk`, at the version
-set by `helpdesk.values.chart_version`. The chart's source is at
-[github.com/duplocloud/helm](https://github.com/duplocloud/helm).
+The `app` root installs the DuploCloud AI Helm chart, which is still published as `oci://quay.io/duplocloud/helpdesk`,
+at the version set by `helpdesk.values.chart_version`. The chart's source is at
+[github.com/duplocloud/duplo-ai-helm](https://github.com/duplocloud/duplo-ai-helm).
 
 ## Quick start
 
@@ -178,7 +178,7 @@ their own names.
 
 | Input | Root | Description |
 |---|---|---|
-| `deployment` | both | `{ name, region, host, xterm_host, account_id }`: `account_id` is the project ID; `host` and `xterm_host` are the Helpdesk hostnames |
+| `deployment` | both | `{ name, region, host, xterm_host, account_id }`: `account_id` is the project ID; `host` and `xterm_host` are the DuploCloud AI hostnames |
 | `state` | app | `{ bucket, region, platform_key }`: `platform_key` is the platform root's state prefix, e.g. `deployments/<name>/platform` |
 | `secrets` | app | Sensitive map: `licensing_token` and `local_admin_password` (sign-in is the local admin, `helpdesk.values.local_admin_email`; Google and Microsoft sign-in are not supported); optional `slack_app_token`, `slack_bot_token`. Pass it as `TF_VAR_secrets` so it never lands in a file |
 | `common_tags` | both | Labels for every resource (lowercase keys and values) |
@@ -189,7 +189,7 @@ created by this code, whoever runs it; it does not mean DuploCloud manages your 
 
 ### Shared storage
 
-`storage.mode` chooses where Helpdesk keeps its files. The backend and the AI agent workload share one
+`storage.mode` chooses where DuploCloud AI keeps its files. The backend and the AI agent workload share one
 ReadWriteMany volume in every mode.
 
 | Mode | What runs | Settings (`storage.values`) |
@@ -214,7 +214,7 @@ the app output `filestore_cleanup` is the command that lists it (see
 
 ### Helm values
 
-The Helpdesk values are one template, [`modules/helpdesk/templates/values.yml.tftpl`](modules/helpdesk/templates/values.yml.tftpl).
+The DuploCloud AI Helm values are one template, [`modules/helpdesk/templates/values.yml.tftpl`](modules/helpdesk/templates/values.yml.tftpl).
 It sets only what differs from the chart defaults (GCP settings, Workload Identity, the Gateway, MongoDB on
 the Bitnami subchart) and renders the storage block for the selected `storage.mode`. Secrets never appear in
 it: they reach Helm through `set_sensitive`.
@@ -255,7 +255,7 @@ pools 40, service account IDs 30); a longer name keeps a short hash of the full 
 | Workload service accounts | `<cluster_name>-backend`, `<cluster_name>-agent`, `<cluster_name>-collector` |
 | StorageClass | `<cluster_name>-filestore` (Filestore modes), `<cluster_name>-nfs` (in-cluster NFS) |
 | Helm release and namespace | `duplo-ai-helpdesk` in `helpdesk` (`helpdesk.values.namespace` overrides) |
-| Helpdesk Kubernetes resources | `<fullname>-...`, set as the chart's `fullnameOverride`: the release name, plus `-helpdesk` unless it contains it (the chart's own rule) |
+| DuploCloud AI Kubernetes resources | `<fullname>-...`, set as the chart's `fullnameOverride`: the release name, plus `-helpdesk` unless it contains it (the chart's own rule) |
 
 ## Outputs
 
@@ -286,7 +286,7 @@ gcloud compute network-endpoint-groups list --filter='network~/<cluster_name>-vp
 ## Security
 
 - Private nodes with no external IPs; egress through Cloud NAT. Custom-mode VPC with no default allow rules.
-- Workload Identity for every workload; no service account keys. The Helpdesk AI agent workload gets
+- Workload Identity for every workload; no service account keys. The DuploCloud AI agent workload gets
   `roles/aiplatform.user` to call Vertex AI; the backend gets no project role, only object access to its two buckets.
   It reaches a customer's project by impersonating a service account listed in
   `helpdesk.values.backend_impersonate_service_accounts`.

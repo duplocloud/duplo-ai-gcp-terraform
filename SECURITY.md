@@ -19,7 +19,7 @@ anything is published.
 **In scope:** this repository's OpenTofu / Terraform code (the `platform` and `app` roots and the modules) and
 its GitHub Actions workflows.
 
-**Out of scope here:** vulnerabilities in the DuploCloud Helpdesk Helm chart, the DuploCloud container images it
+**Out of scope here:** vulnerabilities in the DuploCloud AI Helm chart, the DuploCloud container images it
 deploys, or the DuploCloud platform itself. Report those to the same address, and say which chart version, image
 and tag you were running. Vulnerabilities in the third-party providers this code uses belong upstream.
 
