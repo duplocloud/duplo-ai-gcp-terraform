@@ -9,12 +9,12 @@ variable "cluster_name" {
 }
 
 variable "helpdesk_dns" {
-  description = "Helpdesk hostname"
+  description = "DuploCloud AI hostname"
   type        = string
 }
 
 variable "helpdesk_xterm_dns" {
-  description = "Helpdesk xterm hostname"
+  description = "DuploCloud AI xterm hostname"
   type        = string
 }
 

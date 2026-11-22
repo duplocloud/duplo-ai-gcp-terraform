@@ -75,7 +75,7 @@ run "storage_new_filestore" {
   }
   assert {
     condition     = strcontains(module.helpdesk.release_name, "duplo-ai-helpdesk")
-    error_message = "The Helpdesk release is installed."
+    error_message = "The DuploCloud AI release is installed."
   }
 }
 
@@ -147,7 +147,7 @@ run "storage_in_cluster_nfs" {
   }
   assert {
     condition     = yamldecode(module.helpdesk.values)["nfs-server"].persistence.size == "100Gi"
-    error_message = "The NFS disk size reaches the Helpdesk release."
+    error_message = "The NFS disk size reaches the DuploCloud AI release."
   }
   assert {
     condition     = yamldecode(module.helpdesk.values)["nfs-server"].storageClass.name == "hd-gke-nfs" && output.storage_class_name == "hd-gke-nfs"

@@ -22,7 +22,7 @@ resource "google_project_iam_member" "workload" {
   member  = google_service_account.workload[each.value.workload].member
 }
 
-# Backend reads and writes the Helpdesk buckets.
+# Backend reads and writes the DuploCloud AI buckets.
 resource "google_storage_bucket_iam_member" "backend" {
   for_each = toset(local.buckets)
 

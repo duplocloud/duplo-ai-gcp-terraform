@@ -51,7 +51,7 @@ variable "storage" {
 }
 
 variable "helpdesk" {
-  description = "Helpdesk layer (module helpdesk): create only"
+  description = "DuploCloud AI layer (module helpdesk): create only"
   type        = any
 
   validation {
@@ -62,7 +62,7 @@ variable "helpdesk" {
   # Sign-in is the local admin only.
   validation {
     condition     = try(var.helpdesk.values.local_admin_email, "") != ""
-    error_message = "Helpdesk needs helpdesk.values.local_admin_email (the admin who signs in first)."
+    error_message = "DuploCloud AI needs helpdesk.values.local_admin_email (the admin who signs in first)."
   }
 
   validation {
@@ -89,7 +89,7 @@ variable "secrets" {
 
   validation {
     condition     = lookup(var.secrets, "local_admin_password", "") != ""
-    error_message = "Helpdesk needs secrets.local_admin_password (the local admin's password)."
+    error_message = "DuploCloud AI needs secrets.local_admin_password (the local admin's password)."
   }
 }
 

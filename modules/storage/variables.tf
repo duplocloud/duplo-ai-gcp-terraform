@@ -23,7 +23,7 @@ variable "project_id" {
 }
 
 variable "storage_class_name" {
-  description = "Name of the RWX storage class Helpdesk mounts"
+  description = "Name of the RWX storage class DuploCloud AI mounts"
   type        = string
   default     = "ai-studio-filestore"
   nullable    = false

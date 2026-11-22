@@ -4,12 +4,12 @@ output "release_name" {
 }
 
 output "namespace" {
-  description = "Kubernetes namespace of the Helpdesk release"
+  description = "Kubernetes namespace of the DuploCloud AI release"
   value       = helm_release.helpdesk.namespace
 }
 
 output "chart_version" {
-  description = "Helpdesk chart version"
+  description = "DuploCloud AI chart version"
   value       = helm_release.helpdesk.version
 }
 
@@ -44,7 +44,7 @@ output "a_record_names" {
 }
 
 output "storage_class_name" {
-  description = "StorageClass of Helpdesk's shared volumes: created by modules/storage in filestore and existing modes, by the chart's NFS server in incluster mode"
+  description = "StorageClass of DuploCloud AI's shared volumes: created by modules/storage in filestore and existing modes, by the chart's NFS server in incluster mode"
   value       = local.storage_class_name
 }
 

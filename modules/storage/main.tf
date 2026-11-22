@@ -1,15 +1,15 @@
-# The RWX storage Helpdesk mounts:
-#   filestore: the Filestore StorageClass (Basic HDD) here; the Helpdesk chart uses it (filestore.storageClass.create
+# The RWX storage DuploCloud AI mounts:
+#   filestore: the Filestore StorageClass (Basic HDD) here; the DuploCloud AI chart uses it (filestore.storageClass.create
 #              false) and the GKE Filestore CSI driver creates one instance when the backend volume binds
 #   existing:  volumes are subdirectories of an existing Filestore share, served by an NFS provisioner
-#   incluster: nothing here; the Helpdesk chart runs its own NFS server
+#   incluster: nothing here; the DuploCloud AI chart runs its own NFS server
 locals {
   csi      = var.mode == "filestore"
   existing = var.mode == "existing"
 }
 
 # Owned here rather than by the chart, which keeps its class on uninstall (helm.sh/resource-policy: keep): a destroy
-# deletes the class. Retain still keeps the Filestore instance (and Helpdesk's data); it keeps billing until deleted.
+# deletes the class. Retain still keeps the Filestore instance (and DuploCloud AI's data); it keeps billing until deleted.
 # Parameters are immutable, so a change (e.g. an earlier release's zonal class, or a new VPC) replaces the class;
 # volumes already bound keep their instance.
 resource "kubernetes_storage_class_v1" "filestore" {
