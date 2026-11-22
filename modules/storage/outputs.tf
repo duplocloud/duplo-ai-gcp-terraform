@@ -1,5 +1,5 @@
 output "storage_class_name" {
-  description = "RWX storage class Helpdesk mounts"
+  description = "RWX storage class DuploCloud AI mounts"
   value       = var.storage_class_name
 }
 

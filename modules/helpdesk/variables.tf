@@ -24,12 +24,12 @@ variable "workload_pool" {
 }
 
 variable "helpdesk_dns" {
-  description = "Helpdesk hostname"
+  description = "DuploCloud AI hostname"
   type        = string
 }
 
 variable "helpdesk_xterm_dns" {
-  description = "Helpdesk xterm hostname"
+  description = "DuploCloud AI xterm hostname"
   type        = string
 }
 
@@ -46,7 +46,7 @@ variable "release_name" {
 }
 
 variable "namespace" {
-  description = "Kubernetes namespace for the Helpdesk release. This module creates it, so it must not already exist on the cluster (on an adopted cluster, pick an unused name); Workload Identity bindings follow it"
+  description = "Kubernetes namespace for the DuploCloud AI release. This module creates it, so it must not already exist on the cluster (on an adopted cluster, pick an unused name); Workload Identity bindings follow it"
   type        = string
   default     = "helpdesk"
   nullable    = false
@@ -59,7 +59,7 @@ variable "namespace" {
 
 variable "chart_version" {
   # The default chart release includes the filestore.* values that the filestore storage mode needs.
-  description = "Helpdesk chart version"
+  description = "DuploCloud AI chart version"
   type        = string
   default     = "0.2.24"
   nullable    = false
@@ -109,7 +109,7 @@ variable "dns_zone_project" {
 }
 
 variable "local_admin_email" {
-  description = "Email of the local admin (also the Helpdesk super user), who signs in with secrets.local_admin_password"
+  description = "Email of the local admin (also the DuploCloud AI super user), who signs in with secrets.local_admin_password"
   type        = string
   default     = ""
   nullable    = false
@@ -144,7 +144,7 @@ variable "helpdesk_analytics_collector_enabled" {
 }
 
 variable "helpdesk_mcp_enabled" {
-  description = "Run the Helpdesk MCP server"
+  description = "Run the DuploCloud AI MCP server"
   type        = bool
   default     = true
   nullable    = false

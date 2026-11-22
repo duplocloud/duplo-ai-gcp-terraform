@@ -14,7 +14,7 @@ output "load_balancer_hostname" {
 }
 
 output "helpdesk_url" {
-  description = "Helpdesk URL"
+  description = "DuploCloud AI URL"
   value       = "https://${var.deployment.host}"
 }
 
@@ -39,12 +39,12 @@ output "generated" {
 }
 
 output "storage_class_name" {
-  description = "StorageClass of Helpdesk's shared volumes (the in-cluster NFS server's class in incluster mode)"
+  description = "StorageClass of DuploCloud AI's shared volumes (the in-cluster NFS server's class in incluster mode)"
   value       = module.helpdesk.storage_class_name
 }
 
 output "release" {
-  description = "Helm release of Helpdesk: name, namespace and chart version"
+  description = "Helm release of DuploCloud AI: name, namespace and chart version"
   value       = { name = module.helpdesk.release_name, namespace = module.helpdesk.namespace, chart_version = module.helpdesk.chart_version }
 }
 
