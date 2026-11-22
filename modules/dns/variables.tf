@@ -4,7 +4,7 @@ variable "project_id" {
 }
 
 variable "cluster_name" {
-  description = "Naming prefix (the cluster name, as in the AWS repo): <cluster_name>-cert, -certmap, -dnsauth-<host>"
+  description = "Naming prefix (the cluster name): <cluster_name>-cert, -certmap, -dnsauth-<host>"
   type        = string
 }
 

@@ -1,5 +1,5 @@
 locals {
-  # <cluster_name>-<purpose>, as in the AWS repo. GCP limits: node pools 40 characters, service account ids 30;
+  # <cluster_name>-<purpose>. Google Cloud limits: node pools 40 characters, service account ids 30;
   # a longer name keeps a hash of the full name (and the purpose at the end).
   node_pool_name = length("${var.cluster_name}-default-np") <= 40 ? "${var.cluster_name}-default-np" : "${substr(var.cluster_name, 0, 24)}-${substr(sha1(var.cluster_name), 0, 4)}-default-np"
   node_sa_id     = length("${var.cluster_name}-node") <= 30 ? "${var.cluster_name}-node" : "${substr(var.cluster_name, 0, 20)}-${substr(sha1(var.cluster_name), 0, 4)}-node"

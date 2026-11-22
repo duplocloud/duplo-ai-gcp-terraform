@@ -9,7 +9,7 @@ variable "region" {
 }
 
 variable "cluster_name" {
-  description = "Naming prefix (the cluster name, as in the AWS repo): <cluster_name>-gateway, -ssl-policy, -backend, ..."
+  description = "Naming prefix (the cluster name): <cluster_name>-gateway, -ssl-policy, -backend, ..."
   type        = string
 }
 
@@ -58,8 +58,7 @@ variable "namespace" {
 }
 
 variable "chart_version" {
-  # The build of helpdesk-helm feature/filestore-backend (PR #100): the first chart with filestore.*.
-  # Move to the release that ships it once the PR merges.
+  # The default chart release includes the filestore.* values that the filestore storage mode needs.
   description = "Helpdesk chart version"
   type        = string
   default     = "0.2.24"

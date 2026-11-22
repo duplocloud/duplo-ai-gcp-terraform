@@ -1,20 +1,23 @@
 # terraform-google-helpdesk
 
-OpenTofu / Terraform code that deploys [DuploCloud](https://duplocloud.com) **Helpdesk** into your own Google Cloud
-project: a VPC, a private GKE cluster, shared storage, Cloud Storage buckets, a Google-managed certificate
-with DNS, and the Helpdesk Helm release behind a Gateway API load balancer.
+[DuploCloud](https://duplocloud.com) Helpdesk is an AI-powered helpdesk: AI agents work support tickets alongside
+your team, with a web interface and optional Slack integration. This repository is the OpenTofu / Terraform code
+that deploys Helpdesk into your own Google Cloud project: a VPC, a private GKE cluster, shared storage, Cloud
+Storage buckets, a Google-managed certificate with DNS, and the Helpdesk Helm release behind a Gateway API load
+balancer.
 
 Every layer can be **created** or can **adopt** something you already have: an existing VPC and subnet,
 GKE cluster, Filestore instance, bucket or certificate map. Adopted resources are read, never modified, so
 the same code serves a new project (greenfield) and one with an established platform (brownfield).
 
-The repository works on its own, and it is also what the DuploCloud DevKit's Cloud Deployment agent runs. It was
-first published as `duplocloud/helpdesk-gcp`; GitHub redirects the old name.
-It follows the same layout and contract as
-[`terraform-aws-helpdesk`](https://github.com/duplocloud/terraform-aws-helpdesk).
+You can use this repository on its own. DuploCloud's managed deployment tooling also uses this repository and
+pins tagged releases. It follows the same layout, inputs and output names as the AWS and Azure versions,
+[`terraform-aws-helpdesk`](https://github.com/duplocloud/terraform-aws-helpdesk) and
+[`terraform-azure-helpdesk`](https://github.com/duplocloud/terraform-azure-helpdesk).
 
 - [Architecture](#architecture)
 - [Requirements](#requirements)
+- [Helm chart](#helm-chart)
 - [Quick start](#quick-start)
 - [Repository layout](#repository-layout)
 - [Configuration](#configuration)
@@ -57,10 +60,12 @@ state with `terraform_remote_state`.
 
 ## Requirements
 
-- OpenTofu 1.10 or later (CI and the DevKit agent run 1.13). Terraform 1.10+ also works but is not tested here.
-- A GCS bucket for state. The agent uses `duplo-helpdesk-tfstate-<project_id>`, versioned, with uniform
-  access.
-- A DuploCloud Helpdesk license token.
+- OpenTofu 1.10 or later (CI runs 1.13). Terraform 1.10+ also works but is not tested here.
+- A GCS bucket for state, ideally versioned and with uniform bucket-level access. The examples use
+  `duplo-helpdesk-tfstate-<project_id>`; any name works.
+- A DuploCloud Helpdesk license token (passed as `secrets.licensing_token`).
+- Vertex AI access in the project to the Anthropic Claude models Helpdesk uses (enable them in Vertex AI Model
+  Garden). The `platform` root enables the Vertex AI API.
 - Google credentials for the target project with these roles:
 
 | Role | Needed for |
@@ -75,6 +80,12 @@ state with `terraform_remote_state`.
 | `roles/resourcemanager.projectIamAdmin` | Project IAM bindings for those service accounts |
 | `roles/dns.admin` | Records in the Cloud DNS zone (on the zone's project) |
 | `roles/certificatemanager.owner` | Certificate, DNS authorizations, certificate map |
+
+## Helm chart
+
+The `app` root installs the DuploCloud Helpdesk Helm chart, `oci://quay.io/duplocloud/helpdesk`, at the version
+set by `helpdesk.values.chart_version`. The chart's source is at
+[github.com/duplocloud/helm](https://github.com/duplocloud/helm).
 
 ## Quick start
 
@@ -147,7 +158,7 @@ default.
 
 | Layer | Root | Modes | `provides` for adopt modes |
 |---|---|---|---|
-| `network` | platform | `create`, `existing` | `vpc_id` (the VPC; global), `subnet_id` (the node subnet in the region) and that subnet's `pods_range_name` and `services_range_name` (secondary ranges picked in the wizard; the subnet must already have both, since an adopted subnet is never modified) |
+| `network` | platform | `create`, `existing` | `vpc_id` (the VPC; global), `subnet_id` (the node subnet in the region) and that subnet's `pods_range_name` and `services_range_name` (its secondary ranges; the subnet must already have both, since an adopted subnet is never modified) |
 | `cluster` | platform | `create`, `existing` | `cluster_name`, `cluster_endpoint`, `cluster_ca_certificate`; optional `workload_pool`, `node_service_account`, `network_id` (the cluster's VPC, checked against `network`) |
 | `buckets` | platform | `create`, `existing` | `bucket_name`, `bucket_arn` (its `gs://` URL); optional `userdata_bucket_name`, `userdata_bucket_arn` |
 | `dns` | platform | `managed`, `certificate`, `external` | `certificate_map_name`, `certificate_arn` (the certificate ID); optional `certificate_validation_records`, `dns_zone_name`, `dns_zone_project` (for `certificate`) |
@@ -156,12 +167,12 @@ default.
 
 Everything runs on the `network` layer's VPC: Filestore attaches to it and the nodes live in it. So an adopted
 cluster needs `network.mode = "existing"` with the cluster's own VPC (a validation rejects a new VPC, or a
-`cluster.provides.network_id` on another VPC), and an existing Filestore instance must be on that VPC. The
-DevKit wizard lists only the clusters and Filestore instances on the VPC picked in the Network step.
+`cluster.provides.network_id` on another VPC), and an existing Filestore instance must be on that VPC.
 
-Output and `provides` names follow `terraform-aws-helpdesk` where the concept is the same (`vpc_id`,
-`certificate_arn`, `bucket_arn`, `load_balancer_hostname`), even though the GCP values are a network path, a
-certificate ID, a `gs://` URL and an IP address. GCP-only values keep their own names.
+Output and `provides` names are shared with the AWS version of this stack where the concept is the same
+(`vpc_id`, `certificate_arn`, `bucket_arn`, `load_balancer_hostname`), even though the Google Cloud values are a
+network path, a certificate ID, a `gs://` URL and an IP address. Values that exist only on Google Cloud keep
+their own names.
 
 ### Other inputs
 
@@ -172,10 +183,14 @@ certificate ID, a `gs://` URL and an IP address. GCP-only values keep their own 
 | `secrets` | app | Sensitive map: `licensing_token` and `local_admin_password` (sign-in is the local admin, `helpdesk.values.local_admin_email`; Google and Microsoft sign-in are not supported); optional `slack_app_token`, `slack_bot_token`. Pass it as `TF_VAR_secrets` so it never lands in a file |
 | `common_tags` | both | Labels for every resource (lowercase keys and values) |
 
+Every resource that supports labels also gets `duplocloud-deployment = <deployment.name>` and
+`duplocloud-managed-by = cloud-deployment-agent`. The `managed-by` value is fixed and identifies resources
+created by this code, whoever runs it; it does not mean DuploCloud manages your project.
+
 ### Shared storage
 
-`storage.mode` chooses where Helpdesk keeps its files. The backend and the agent share one ReadWriteMany
-volume in every mode.
+`storage.mode` chooses where Helpdesk keeps its files. The backend and the AI agent workload share one
+ReadWriteMany volume in every mode.
 
 | Mode | What runs | Settings (`storage.values`) |
 |---|---|---|
@@ -210,20 +225,15 @@ chart 0.2.19+), and renders the Slack backend when `helpdesk.values.slack_backen
 through `secrets`). The chart's own nightly MongoDB dump keeps its default volume, a Persistent Disk in the
 cluster's default class, never a Filestore instance.
 
-Chart-managed Filestore needs a chart with the `filestore.*` values
-([helpdesk-helm#100](https://github.com/duplocloud-internal/helpdesk-helm/pull/100), `feature/filestore-backend`).
-Until it is merged and released, the module default `chart_version` is that branch's build
-`0.2.24-feature-filestore-backend-09fe37e`; the DevKit wizard already asks for `0.2.24`. Once the release that
-includes it is out, the module default moves to it (a release of this repo) and the two agree again. With a
-chart that has no `filestore.*` values, use the `existing` or `incluster` storage mode.
+The default chart release includes the `filestore.*` values that the `filestore` storage mode needs. With an
+older chart that has no `filestore.*` values, use the `existing` or `incluster` storage mode.
 
 ## Resource naming
 
-Names follow the AWS repo: one prefix, the cluster name (`cluster.values.cluster_name`, default
-`<deployment>-gke`), then the purpose. The prefix is the configured cluster name even when an existing
-cluster is adopted, so two deployments on one cluster never collide. Google Cloud limits name length (most
-resources 63 characters, node pools 40, service account IDs 30); a longer name keeps a short hash of the
-full name.
+Names use one prefix, the cluster name (`cluster.values.cluster_name`, default `<deployment>-gke`), then the
+purpose. The prefix is the configured cluster name even when an existing cluster is adopted, so two
+deployments on one cluster never collide. Google Cloud limits name length (most resources 63 characters, node
+pools 40, service account IDs 30); a longer name keeps a short hash of the full name.
 
 | Resource | Name |
 |---|---|
@@ -266,10 +276,6 @@ gcloud filestore instances list --project <project> --filter='labels.duplocloud-
 gcloud filestore instances delete <instance> --location <zone> --project <project>
 ```
 
-State from the repository's original `terraform/` layout cannot be migrated: the roots, modules and inputs were
-rebuilt, and the code carries no `moved`, `import` or `removed` blocks. Destroy a deployment made with the old
-layout with that code, then deploy it again with this one.
-
 If deleting the VPC fails with `already being used by ... networkEndpointGroups/k8s1-...`, delete the
 leftover network endpoint groups and retry:
 
@@ -280,10 +286,10 @@ gcloud compute network-endpoint-groups list --filter='network~/<cluster_name>-vp
 ## Security
 
 - Private nodes with no external IPs; egress through Cloud NAT. Custom-mode VPC with no default allow rules.
-- Workload Identity for every workload; no service account keys. The same grants as on AWS: the agent gets
-  `roles/aiplatform.user` (Bedrock on AWS), the backend gets no project role, only object access to its two buckets.
+- Workload Identity for every workload; no service account keys. The Helpdesk AI agent workload gets
+  `roles/aiplatform.user` to call Vertex AI; the backend gets no project role, only object access to its two buckets.
   It reaches a customer's project by impersonating a service account listed in
-  `helpdesk.values.backend_impersonate_service_accounts` (the AWS backend assumes a role the target account trusts).
+  `helpdesk.values.backend_impersonate_service_accounts`.
   Neither gets project-wide token creator.
 - HTTPS-only Gateway with a TLS 1.2+ `MODERN` SSL policy and a Google-managed certificate.
 - Hardened GKE: Shielded nodes on Container-Optimized OS, kubelet read-only port off, insecure RBAC bindings
@@ -293,6 +299,8 @@ gcloud compute network-endpoint-groups list --filter='network~/<cluster_name>-vp
 - The JWT shared secret and the MongoDB root password are generated (`random_password`) and kept in state,
   so protect the state bucket accordingly.
 - Provider versions and checksums are pinned by the committed `.terraform.lock.hcl` in each root.
+
+To report a vulnerability, see [SECURITY.md](SECURITY.md). Please do not open a public issue.
 
 ## Tests
 
@@ -312,10 +320,10 @@ listed there.
 ## Terraform and OpenTofu
 
 The code is Terraform-language configuration, so the familiar name is used for it. It is developed, tested
-(`tofu test`, CI) and run by the DevKit agent with **OpenTofu** (MPL-2.0), with providers from
+(`tofu test`, CI) with **OpenTofu** (MPL-2.0), with providers from
 `registry.opentofu.org` (see the lock files). The repo needs no HashiCorp Terraform binary. Terraform is a
 trademark of HashiCorp.
 
 ## License
 
-[Apache License 2.0](LICENSE), as [`terraform-aws-helpdesk`](https://github.com/duplocloud/terraform-aws-helpdesk).
+[Apache License 2.0](LICENSE).

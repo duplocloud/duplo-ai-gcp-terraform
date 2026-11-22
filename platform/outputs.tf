@@ -1,5 +1,5 @@
 output "name_prefix" {
-  description = "Prefix of every resource this deployment creates (<cluster_name>-<purpose>, as in the AWS repo)"
+  description = "Prefix of every resource this deployment creates (<cluster_name>-<purpose>)"
   value       = local.cluster_name
 }
 
@@ -59,7 +59,7 @@ output "bucket_name" {
 }
 
 output "bucket_arn" {
-  description = "App data bucket URL (gs://...); named as on AWS"
+  description = "App data bucket URL (gs://...); the output name is shared with the AWS version of this stack"
   value       = local.bucket_arn
 }
 
@@ -69,12 +69,12 @@ output "userdata_bucket_name" {
 }
 
 output "userdata_bucket_arn" {
-  description = "User data bucket URL (gs://...); named as on AWS"
+  description = "User data bucket URL (gs://...); the output name is shared with the AWS version of this stack"
   value       = local.userdata_bucket_arn
 }
 
 output "certificate_arn" {
-  description = "Certificate Manager certificate ID; named as on AWS"
+  description = "Certificate Manager certificate ID; the output name is shared with the AWS version of this stack"
   value       = local.certificate_arn
 }
 

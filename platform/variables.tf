@@ -17,7 +17,7 @@ variable "network" {
   description = "Network layer (module vpc)"
   type        = any
 
-  # An adopted network names the VPC, the node subnet and the subnet's Pod and Service ranges (picked in the wizard).
+  # An adopted network names the VPC, the node subnet and the subnet's Pod and Service ranges.
   validation {
     condition = try(var.network.mode, "") == "create" || alltrue([
       for k in ["vpc_id", "subnet_id", "pods_range_name", "services_range_name"] : try(coalesce(var.network.provides[k]), "") != ""
@@ -42,8 +42,8 @@ variable "cluster" {
   description = "Cluster layer (module gke)"
   type        = any
 
-  # An adopted cluster must be on the Network layer's VPC: Filestore and the Gateway attach to that VPC. The wizard
-  # lists only those clusters and sends the cluster's VPC as provides.network_id, which is required so this can check.
+  # An adopted cluster must be on the Network layer's VPC: Filestore and the Gateway attach to that VPC. The cluster's
+  # VPC is required as provides.network_id so that this can be checked.
   validation {
     condition = (try(var.cluster.mode, "") != "existing" || (
       try(coalesce(var.cluster.provides.network_id), "") != ""
