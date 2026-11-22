@@ -13,7 +13,7 @@ CI runs the same commands (OpenTofu 1.13.2, TFLint 0.65.0) on every pull request
 
 ## Compatibility rules
 
-Tooling that deploys Helpdesk, including DuploCloud's managed deployment tooling, pins tagged releases of this
+Tooling that deploys DuploCloud AI, including DuploCloud's managed deployment tooling, pins tagged releases of this
 repository, reads the module variables and runs the two roots. The AWS and Azure versions of this stack follow
 the same rules. Keep these properties so that existing deployments and that tooling keep working:
 
@@ -40,7 +40,7 @@ the same rules. Keep these properties so that existing deployments and that tool
 - **Plain OpenTofu / Terraform only**: no tool-specific UI or configuration files in this repository. The
   variable descriptions are the documentation for each input.
 
-## Where this repo differs from `terraform-aws-helpdesk`
+## Where this repo differs from `duplo-ai-aws-terraform`
 
 Deliberate, so keep them unless the AWS repo changes too:
 
@@ -69,7 +69,7 @@ plan destructive for no reason.
   bump is a **breaking change**: list it under "Breaking changes" in the release notes.
 - Do not change defaults that would replace existing resources (instance types, CIDRs, names) without a
   breaking-change note.
-- Keep the Helm `fullnameOverride` (modules/helpdesk `local.fullname`) stable: it names every Helpdesk
+- Keep the Helm `fullnameOverride` (modules/helpdesk `local.fullname`) stable: it names every DuploCloud AI
   Kubernetes resource, so a change renames them all on upgrade (new volume claims, a new MongoDB StatefulSet).
 
 ## Providers and lock files
