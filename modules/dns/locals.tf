@@ -6,7 +6,7 @@ locals {
 
   labels = { component = "dns" }
 
-  # <cluster_name>-<purpose>, as in the AWS repo (63 characters max; longer names keep a hash of the full name).
+  # <cluster_name>-<purpose> (63 characters max; longer names keep a hash of the full name).
   names = { for k, v in {
     cert               = "${var.cluster_name}-cert"
     certmap            = "${var.cluster_name}-certmap"

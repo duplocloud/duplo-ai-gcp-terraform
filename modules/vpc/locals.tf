@@ -1,5 +1,5 @@
 locals {
-  # <cluster_name>-<purpose>, as in the AWS repo (63 characters max; longer names keep a hash of the full name).
+  # <cluster_name>-<purpose> (63 characters max; longer names keep a hash of the full name).
   names = { for k, v in {
     vpc            = "${var.cluster_name}-vpc"
     subnet         = "${var.cluster_name}-private"

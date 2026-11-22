@@ -6,11 +6,11 @@ locals {
   create_buckets = var.buckets.mode == "create"
   create_dns     = contains(["managed", "external"], var.dns.mode)
 
-  # Naming prefix for every created resource, as in the AWS repo (<deployment>-eks there): <cluster_name>-<purpose>.
+  # Naming prefix for every created resource: <cluster_name>-<purpose>.
   cluster_name = try(var.cluster.values.cluster_name, null) != null ? var.cluster.values.cluster_name : "${var.deployment.name}-gke"
 
   # Each value comes from the module in create mode, otherwise from what the adopt mode provides. An adopted
-  # subnet's Pod and Service ranges are the ones picked in the wizard (provides), never guessed from their names.
+  # subnet's Pod and Service ranges are the ones named in provides, never guessed from their names.
   network_id          = local.create_network ? module.vpc[0].network_id : try(var.network.provides.vpc_id, null)
   subnet_id           = local.create_network ? module.vpc[0].subnet_id : try(var.network.provides.subnet_id, null)
   pods_range_name     = local.create_network ? module.vpc[0].pods_range_name : try(var.network.provides.pods_range_name, null)
@@ -27,7 +27,7 @@ locals {
   userdata_bucket_name = local.create_buckets ? module.gcs[0].userdata_bucket_name : try(var.buckets.provides.userdata_bucket_name, null)
   userdata_bucket_arn  = local.create_buckets ? module.gcs[0].userdata_bucket_url : try(var.buckets.provides.userdata_bucket_arn, null)
 
-  # As on AWS, an adopt mode may provide every DNS value, with the same fallbacks.
+  # An adopt mode may provide every DNS value; a missing optional value falls back to the try() default.
   certificate_arn                = local.create_dns ? module.dns[0].certificate_id : try(var.dns.provides.certificate_arn, null)
   certificate_map_name           = local.create_dns ? module.dns[0].certificate_map_name : try(var.dns.provides.certificate_map_name, null)
   certificate_validation_records = local.create_dns ? module.dns[0].validation_records : try(var.dns.provides.certificate_validation_records, [])

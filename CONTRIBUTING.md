@@ -11,11 +11,11 @@ cd ../app   && tofu init -backend=false && tofu validate && tofu test
 
 CI runs the same commands (OpenTofu 1.13.2, TFLint 0.65.0) on every pull request.
 
-## The contract
+## Compatibility rules
 
-The DuploCloud Cloud Deployment agent pins releases of this repo, renders a setup wizard from the module
-variables, and runs the two roots. Keep these properties, or the agent (and every other cloud's
-equivalent repo) breaks:
+Tooling that deploys Helpdesk, including DuploCloud's managed deployment tooling, pins tagged releases of this
+repository, reads the module variables and runs the two roots. The AWS and Azure versions of this stack follow
+the same rules. Keep these properties so that existing deployments and that tooling keep working:
 
 - **Layout**: `platform/`, `app/`, `modules/<module>/` at the repo root. Roots reference modules as
   `../modules/<module>`. Each root has `versions.tf`, `backend.tf` with an empty `backend "gcs" {}` block,
@@ -31,13 +31,14 @@ equivalent repo) breaks:
 - **Root inputs**: `deployment` `{ name, region, host, xterm_host, account_id }` (`account_id` is the GCP
   project ID), `state` (app root; `platform_key` is the platform root's GCS prefix),
   `secrets` (sensitive map, app root), `common_tags`.
-- **Outputs**: the output names in `platform/outputs.tf` and `app/outputs.tf` are part of the contract.
-  They follow `terraform-aws-helpdesk` where the concept is the same; the agent reads `certificate_arn`,
-  `certificate_validation_records`, `dns_mode` (platform) and `load_balancer_hostname`, `helpdesk_url`,
-  `dns_records`, `secrets`, `generated` (app).
+- **Outputs**: the output names in `platform/outputs.tf` and `app/outputs.tf` are part of the public
+  interface; do not rename or remove them. They match the AWS version where the concept is the same. Automation
+  reads `certificate_arn`, `certificate_validation_records`, `dns_mode` (platform) and `load_balancer_hostname`,
+  `helpdesk_url`, `dns_records`, `secrets`, `generated` (app).
 - **No secrets on disk**: no `local_file`/`local_sensitive_file`; secrets only via `var.secrets`; generated
   secrets via `random_password`.
-- **No `ui.yaml`** or other wizard files: the agent keeps its presentation layer in its own repo.
+- **Plain OpenTofu / Terraform only**: no tool-specific UI or configuration files in this repository. The
+  variable descriptions are the documentation for each input.
 
 ## Where this repo differs from `terraform-aws-helpdesk`
 
@@ -56,9 +57,9 @@ Deliberate, so keep them unless the AWS repo changes too:
 
 ## Upgrade safety
 
-Every release reaches existing deployments: the agent moves customers to the newly pinned release on their
-next plan. A user always reviews the plan before anything is applied, but a release must not make that plan
-destructive for no reason.
+Every release can reach existing deployments: a deployment that moves to a newer release picks up its changes
+on the next plan. A user always reviews the plan before anything is applied, but a release must not make that
+plan destructive for no reason.
 
 - Renaming or moving a resource (including into or out of a module, or changing a `count`/`for_each` key)
   needs a `moved` block.
@@ -73,7 +74,7 @@ destructive for no reason.
 
 ## Providers and lock files
 
-After changing a `required_providers` block, regenerate the lock files for all platforms the agent runs on:
+After changing a `required_providers` block, regenerate the lock files for all supported platforms:
 
 ```bash
 for r in platform app; do
@@ -84,6 +85,6 @@ done
 
 ## Releases
 
-Semver tags `vX.Y.Z` on `main`, never moved or deleted (the agent pins the tag and its commit SHA). The
+Semver tags `vX.Y.Z` on `main`, never moved or deleted (deployments pin the tag and its commit SHA). The
 GitHub release notes list, per module: variables added, removed or changed; outputs added or removed;
 provider version changes; and a "Breaking changes" section (or "None").

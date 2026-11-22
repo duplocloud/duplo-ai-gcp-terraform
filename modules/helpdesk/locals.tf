@@ -38,7 +38,7 @@ locals {
 
   buckets = compact([var.bucket_name, var.userdata_bucket_name])
 
-  # <cluster_name>-<purpose>, as in the AWS repo (63 characters max; longer names keep a hash of the full name).
+  # <cluster_name>-<purpose> (63 characters max; longer names keep a hash of the full name).
   # The NFS StorageClass is cluster-scoped, so the per-deployment prefix also keeps it from colliding.
   names = { for k, v in {
     gateway    = "${var.cluster_name}-gateway"

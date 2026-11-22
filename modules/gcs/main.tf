@@ -1,4 +1,4 @@
-# App data and user data buckets, named as in the AWS repo (<deployment>-helpdesk[-userdata]-<account>).
+# App data and user data buckets, named <deployment>-helpdesk[-userdata]-<account>.
 # Bucket names are global, so they carry the project ID; over 63 characters keeps a hash of the full name.
 locals {
   buckets = { for k, v in {
