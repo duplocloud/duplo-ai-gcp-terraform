@@ -326,4 +326,8 @@ trademark of HashiCorp.
 
 ## License
 
-[Apache License 2.0](LICENSE).
+The code in this repository is licensed under the [Apache License 2.0](LICENSE). The DuploCloud container images it
+deploys are not: they are licensed under the DuploCloud Terms of Service, which you accept in the DuploCloud console
+when you get a license token (current version: <https://console.duplocloud.com/api/terms/current/>). Third-party
+charts, images and providers keep their own licenses. See [NOTICE](NOTICE) for the full breakdown and
+[PRIVACY.md](PRIVACY.md) for what the platform sends to DuploCloud.

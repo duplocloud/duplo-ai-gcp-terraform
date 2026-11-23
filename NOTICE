@@ -1,0 +1,34 @@
+duplo-ai-gcp-terraform
+Copyright 2026 DuploCloud, Inc.
+
+This product includes software developed by DuploCloud, Inc. ("DuploCloud").
+
+================================================================================
+COVERED BY THE APACHE LICENSE, VERSION 2.0
+================================================================================
+
+The OpenTofu / Terraform code and other files in this repository authored by
+DuploCloud are licensed under the Apache License, Version 2.0 (see LICENSE).
+You may use, modify, and redistribute them under the terms of that license.
+
+================================================================================
+NOT COVERED BY THE APACHE LICENSE -- WHAT THIS CODE DEPLOYS
+================================================================================
+
+This code installs the DuploCloud AI Helm chart into your Google Cloud environment.
+The Apache License above does not extend to what that chart deploys:
+
+  - The container images DuploCloud builds from its own proprietary source code
+    are proprietary software licensed under the DuploCloud Terms of Service,
+    which you accept in the DuploCloud console when you obtain the license
+    token this code requires. The current version of the Terms is published
+    at:
+
+        https://console.duplocloud.com/api/terms/current/
+
+  - The chart itself and third-party charts and images are licensed under their
+    own terms. See the NOTICE and THIRD_PARTY_NOTICES.md files in
+    https://github.com/duplocloud/duplo-ai-helm.
+
+Terraform and OpenTofu providers and modules this code uses are licensed by
+their publishers under their own terms.
