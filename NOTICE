@@ -21,10 +21,10 @@ The Apache License above does not extend to what that chart deploys:
   - The container images DuploCloud builds from its own proprietary source code
     are proprietary software licensed under the DuploCloud Terms of Service,
     which you accept in the DuploCloud console when you obtain the license
-    token this code requires. The current version of the Terms is published
+    token this code requires. The Terms are published
     at:
 
-        https://console.duplocloud.com/api/terms/current/
+        https://duplocloud.com/legal/terms-of-service/
 
   - The chart itself and third-party charts and images are licensed under their
     own terms. See the NOTICE and THIRD_PARTY_NOTICES.md files in
