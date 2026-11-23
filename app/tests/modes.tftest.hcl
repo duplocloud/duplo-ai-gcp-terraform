@@ -319,6 +319,13 @@ run "values_match_aws" {
     error_message = "As on AWS: the web terminal runs, the database name is fixed, and the MongoDB sub-chart backup is off."
   }
   assert {
+    condition = yamldecode(module.helpdesk.values).upgrader.bootstrap == {
+      enabled = true
+      values  = { channels = { initialChannel = "hdst-stable" } }
+    }
+    error_message = "As on AWS: the upgrader hook is on and this install enrolls on hdst-stable."
+  }
+  assert {
     condition     = !can(yamldecode(module.helpdesk.values).mongodbBackup)
     error_message = "The chart's MongoDB dump keeps its own claim on the default Persistent Disk class (no Filestore instance, nothing orphaned on upgrade)."
   }
