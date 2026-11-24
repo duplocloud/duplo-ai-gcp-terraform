@@ -142,3 +142,11 @@ helpdeskMcp:
   enabled: ${helpdesk_mcp_enabled}
 bedrockSubscription:
   enabled: false
+# The chart leaves the upgrader hook off, and a hook that runs without a channel enrolls on hd-stable.
+# This install turns the hook on and enrolls on hdst-stable. A chart without the hook ignores these keys.
+upgrader:
+  bootstrap:
+    enabled: true
+    values:
+      channels:
+        initialChannel: hdst-stable
